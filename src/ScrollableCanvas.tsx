@@ -40,27 +40,21 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
 
   const ref = useRef<HTMLCanvasElement>(null);
   const { width, height } = useWindowSize();
-  useEffect(() => start(), [width, height, start]);
 
-  const onDrag = useCallback(
-    (dx: number, dy: number) => {
-      setX((old) => old + dx);
-      setY((old) => old + dy);
-      start();
-    },
-    [start]
-  );
+  // request an animation frame whenever any parameter changes
+  useEffect(() => start(), [width, height, x, y, z, start]);
 
-  const onWheel = useCallback(
-    (e: ReactWheelEvent) => {
-      if (e.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
-        const dz = e.deltaY / -mouseZoomStep;
-        setZ((old) => clamp(old + dz, minZoom, maxZoom));
-        start();
-      }
-    },
-    [start]
-  );
+  const onDrag = useCallback((dx: number, dy: number) => {
+    setX((old) => old + dx);
+    setY((old) => old + dy);
+  }, []);
+
+  const onWheel = useCallback((e: ReactWheelEvent) => {
+    if (e.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+      const dz = e.deltaY / -mouseZoomStep;
+      setZ((old) => clamp(old + dz, minZoom, maxZoom));
+    }
+  }, []);
 
   const { cursor, ...canvasProps } = useDragListener(onDrag);
   const style = useMemo(
