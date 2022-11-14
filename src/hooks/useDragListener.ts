@@ -1,5 +1,5 @@
 import {
-  MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
   useCallback,
   useMemo,
   useState,
@@ -16,16 +16,16 @@ export default function useDragListener(callback: DragCallback) {
 
   const cursor = useMemo(() => (active ? "grabbing" : "grab"), [active]);
 
-  const onMouseDown = useCallback(
-    (e: ReactMouseEvent) => {
+  const onPointerDown = useCallback(
+    (e: ReactPointerEvent) => {
       set();
       setX(e.clientX);
       setY(e.clientY);
     },
     [set]
   );
-  const onMouseMove = useCallback(
-    (e: ReactMouseEvent) => {
+  const onPointerMove = useCallback(
+    (e: ReactPointerEvent) => {
       if (active) {
         const dx = e.clientX - x;
         const dy = e.clientY - y;
@@ -38,5 +38,5 @@ export default function useDragListener(callback: DragCallback) {
     [active, callback, x, y]
   );
 
-  return { cursor, onMouseDown, onMouseUp: clear, onMouseMove };
+  return { cursor, onPointerDown, onPointerUp: clear, onPointerMove };
 }
