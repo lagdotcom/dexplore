@@ -7,7 +7,7 @@ import {
 
 import useFlag from "./useFlag";
 
-type DragCallback = (x: number, y: number) => void;
+type DragCallback = (dx: number, dy: number) => void;
 
 export default function useDragListener(callback: DragCallback) {
   const [active, { clear, set }] = useFlag(false);

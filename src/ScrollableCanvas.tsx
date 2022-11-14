@@ -1,4 +1,5 @@
 import {
+  CSSProperties,
   WheelEvent as ReactWheelEvent,
   useCallback,
   useEffect,
@@ -30,11 +31,11 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
   const [y, setY] = useState(0);
   const [z, setZ] = useState(1);
 
-  const [stop, start] = useRafLoop(() => {
+  const [cancel, refresh] = useRafLoop(() => {
     const ctx = ref.current?.getContext("2d");
     if (ctx && ref.current) {
       onPaint(ctx, ref.current, x, y, z);
-      stop();
+      cancel();
     }
   }, true);
 
@@ -42,7 +43,7 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
   const { width, height } = useWindowSize();
 
   // request an animation frame whenever any parameter changes
-  useEffect(() => start(), [width, height, x, y, z, start]);
+  useEffect(() => refresh(), [width, height, x, y, z, refresh]);
 
   const onDrag = useCallback((dx: number, dy: number) => {
     setX((old) => old + dx);
@@ -57,7 +58,7 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
   }, []);
 
   const { cursor, ...canvasProps } = useDragListener(onDrag);
-  const style = useMemo(
+  const style = useMemo<CSSProperties>(
     () => ({ cursor, width, height }),
     [cursor, height, width]
   );
