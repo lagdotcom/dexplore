@@ -1,6 +1,7 @@
-import ScrollableCanvas, { RenderCallback } from "./ScrollableCanvas";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import ScrollableCanvas, { RenderCallback } from ".";
+import { act, fireEvent, screen } from "@testing-library/react";
 
+import { renderWithProviders } from "../../test/tools";
 import userEvent from "@testing-library/user-event";
 
 function delay(ms: number) {
@@ -11,7 +12,7 @@ function delay(ms: number) {
 
 function setup() {
   const onPaint = jest.fn<void, Parameters<RenderCallback>>();
-  render(<ScrollableCanvas onPaint={onPaint} />);
+  renderWithProviders(<ScrollableCanvas onPaint={onPaint} />);
 
   const target = screen.getByTestId("scrollable-canvas");
   const user = userEvent.setup();
@@ -43,14 +44,14 @@ test("zooming behaviour", async () => {
   });
   await act(() => delay(200));
   expect(onPaint).toHaveBeenCalled();
-  const zout = onPaint.mock.calls.at(-1) || [0, 0, 0, 0, 1];
-  expect(zout[4]).toBeLessThan(1);
+  const afterZoomOut = onPaint.mock.calls.at(-1) || [0, 0, 0, 0, 1];
+  expect(afterZoomOut[4]).toBeLessThan(1);
 
   fireEvent.wheel(target, {
     deltaMode: WheelEvent.DOM_DELTA_PIXEL,
     deltaY: -2000,
   });
   await act(() => delay(200));
-  const zin = onPaint.mock.calls.at(-1) || [0, 0, 0, 0, 1];
-  expect(zin[4]).toBeGreaterThan(1);
+  const afterZoomIn = onPaint.mock.calls.at(-1) || [0, 0, 0, 0, 1];
+  expect(afterZoomIn[4]).toBeGreaterThan(1);
 });
