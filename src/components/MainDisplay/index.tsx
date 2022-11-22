@@ -1,7 +1,6 @@
+import { CSSProperties, useCallback, useState } from "react";
 import ScrollableCanvas, { RenderCallback } from "../ScrollableCanvas";
-import { useCallback, useState } from "react";
 
-import Box from "ui-box";
 import CanvasPosition from "../../types/CanvasPosition";
 import TokenLayer from "../TokenLayer";
 import { addTokens } from "../../store/slices/tokens";
@@ -13,6 +12,8 @@ function start(offset: number, size: number) {
   const position = offset % size;
   return position < 0 ? position + size : position;
 }
+
+const style: CSSProperties = { overflow: "hidden", position: "relative" };
 
 export default function MainDisplay() {
   const [pos, setPos] = useState<CanvasPosition>({ x: 0, y: 0, z: 1 });
@@ -76,9 +77,9 @@ export default function MainDisplay() {
   }, []);
 
   return (
-    <Box position="relative">
+    <div style={style}>
       <ScrollableCanvas onPaint={render} />
       <TokenLayer position={pos} />
-    </Box>
+    </div>
   );
 }

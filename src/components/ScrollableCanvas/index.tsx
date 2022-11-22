@@ -1,5 +1,4 @@
 import {
-  DragEventHandler,
   WheelEventHandler,
   useCallback,
   useEffect,
@@ -10,13 +9,8 @@ import {
 import useDragListener, { DragHandler } from "../../hooks/useDragListener";
 import { useRafLoop, useWindowSize } from "react-use";
 
-import DragInfo from "../../types/DragInfo";
-import { DragInfoData } from "../../logic/symbols";
 import clamp from "../../tools/clamp";
-import getGridCoordinate from "../../logic/getGridCoordinate";
-import unpack from "../../logic/unpack";
-import { updateToken } from "../../store/slices/tokens";
-import { useAppDispatch } from "../../store/hooks";
+import useTokenDrop from "../../hooks/useTokenDrop";
 
 export type RenderCallback = (
   ctx: CanvasRenderingContext2D,
@@ -33,8 +27,6 @@ const minZoom = 0.2;
 const maxZoom = 3;
 
 export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
-  const dispatch = useAppDispatch();
-
   const [xo, setXO] = useState(0);
   const [yo, setYO] = useState(0);
   const [zoom, setZoom] = useState(1);
@@ -65,23 +57,7 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
     }
   }, []);
 
-  const onDragOver = useCallback<DragEventHandler>((e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  }, []);
-
-  const onDrop = useCallback<DragEventHandler>(
-    (e) => {
-      e.preventDefault();
-
-      const { id, ox, oy } = unpack<DragInfo>(
-        e.dataTransfer.getData(DragInfoData)
-      );
-      const [x, y] = getGridCoordinate(xo + ox, yo + oy, zoom, e);
-      dispatch(updateToken({ id, changes: { x, y } }));
-    },
-    [dispatch, xo, yo, zoom]
-  );
+  const { onDragOver, onDrop } = useTokenDrop(xo, yo, zoom);
 
   const { cursor, ...canvasProps } = useDragListener(onDrag);
   const style = useMemo(

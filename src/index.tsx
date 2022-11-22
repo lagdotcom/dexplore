@@ -4,5 +4,7 @@ import App from "./App";
 import { createRoot } from "react-dom/client";
 
 const container = document.getElementById("app");
-const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+if (!container) throw new Error("app container missing");
+
+const root = createRoot(container);
 root.render(<App />);

@@ -1,4 +1,10 @@
-import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
+import {
+  CSSProperties,
+  DragEventHandler,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 import CanvasPosition from "../../types/CanvasPosition";
@@ -10,10 +16,12 @@ import getGridSize from "../../logic/getGridSize";
 import pack from "../../logic/pack";
 import { selectDraggingTokenId } from "../../store/selectors";
 import { setDragging } from "../../store/slices/app";
+import useTokenDrop from "../../hooks/useTokenDrop";
 
 type Props = { position: CanvasPosition; token: Token };
 
 export default function TokenDisplay({ position, token }: Props) {
+  const imgRef = useRef(null);
   const dispatch = useAppDispatch();
   const gridSize = useMemo(() => getGridSize(position.z), [position.z]);
 
@@ -29,13 +37,11 @@ export default function TokenDisplay({ position, token }: Props) {
 
   const onDragStart = useCallback<DragEventHandler>(
     (e) => {
+      const ox = e.clientX - left;
+      const oy = e.clientY - top;
       e.dataTransfer.setData(
         DragInfoData,
-        pack<DragInfo>({
-          id: token.id,
-          ox: e.clientX - left,
-          oy: e.clientY - top,
-        })
+        pack<DragInfo>({ id: token.id, ox, oy })
       );
       e.dataTransfer.effectAllowed = "move";
 
@@ -47,6 +53,17 @@ export default function TokenDisplay({ position, token }: Props) {
   const onDragEnd = useCallback<DragEventHandler>(() => {
     dispatch(setDragging());
   }, [dispatch]);
+
+  const { onDragOver, onDrop } = useTokenDrop(
+    position.x,
+    position.y,
+    position.z
+  );
+
+  // TODO replace with generic token image if it failed to load
+  const onError = useCallback(() => {
+    console.log("error", token.url);
+  }, [token.url]);
 
   // TODO this doesn't let you move big tokens onto other spaces they occupy
   const draggingId = useAppSelector(selectDraggingTokenId);
@@ -76,8 +93,17 @@ export default function TokenDisplay({ position, token }: Props) {
       style={style}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
-      <img src={token.url} alt={token.id} width={size} height={size} />
+      <img
+        ref={imgRef}
+        src={token.url}
+        alt={token.id}
+        width={size}
+        height={size}
+        onError={onError}
+      />
     </div>
   );
 }

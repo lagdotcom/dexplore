@@ -4,9 +4,9 @@
   "description": "Simple dungeon exploration engine",
   "main": "docs/index.js",
   "scripts": {
-    "start": "esbuild src/index.tsx --bundle --watch --outfile=watch/index.global.js",
-    "watch": "esbuild src/index.tsx --bundle --watch --outfile=watch/index.global.js",
-    "build": "esbuild src/index.tsx --bundle --minify --outfile=docs/index.global.js",
+    "start": "node watch.mjs",
+    "watch": "node watch.mjs",
+    "build": "node build.mjs",
     "lint": "eslint src",
     "test": "jest"
   },
@@ -17,8 +17,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
-    "react-use": "^17.4.0",
-    "ui-box": "^5.3.0"
+    "react-use": "^17.4.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^8.19.0",
