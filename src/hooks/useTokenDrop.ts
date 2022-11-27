@@ -29,7 +29,13 @@ export default function useTokenDrop(
       const { id, ox, oy } = unpack<DragInfo>(
         e.dataTransfer.getData(DragInfoData)
       );
-      const [x, y] = getGridCoordinate(xo + ox, yo + oy, zoom, e);
+      const [x, y] = getGridCoordinate(
+        xo + ox,
+        yo + oy,
+        zoom,
+        e.clientX,
+        e.clientY
+      );
       dispatch(updateToken({ id, changes: { x, y } }));
     },
     [dispatch, xo, yo, zoom]

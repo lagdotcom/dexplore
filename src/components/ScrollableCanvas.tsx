@@ -1,4 +1,5 @@
 import {
+  MouseEventHandler,
   WheelEventHandler,
   useCallback,
   useEffect,
@@ -6,11 +7,13 @@ import {
   useRef,
   useState,
 } from "react";
-import useDragListener, { DragHandler } from "../../hooks/useDragListener";
+import useDragListener, { DragHandler } from "../hooks/useDragListener";
 import { useRafLoop, useWindowSize } from "react-use";
 
-import clamp from "../../tools/clamp";
-import useTokenDrop from "../../hooks/useTokenDrop";
+import clamp from "../tools/clamp";
+import { openContextMenu } from "../store/slices/app";
+import { useAppDispatch } from "../store/hooks";
+import useTokenDrop from "../hooks/useTokenDrop";
 
 export type RenderCallback = (
   ctx: CanvasRenderingContext2D,
@@ -27,6 +30,7 @@ const minZoom = 0.2;
 const maxZoom = 3;
 
 export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
+  const dispatch = useAppDispatch();
   const [xo, setXO] = useState(0);
   const [yo, setYO] = useState(0);
   const [zoom, setZoom] = useState(1);
@@ -57,6 +61,14 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
     }
   }, []);
 
+  const onContextMenu = useCallback<MouseEventHandler>(
+    (e) => {
+      dispatch(openContextMenu({ type: "new", x: e.clientX, y: e.clientY }));
+      e.preventDefault();
+    },
+    [dispatch]
+  );
+
   const { onDragOver, onDrop } = useTokenDrop(xo, yo, zoom);
 
   const { cursor, ...canvasProps } = useDragListener(onDrag);
@@ -76,6 +88,7 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
       onWheel={onWheel}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onContextMenu={onContextMenu}
     />
   );
 }

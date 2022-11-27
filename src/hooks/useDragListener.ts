@@ -4,7 +4,7 @@ import useFlag from "./useFlag";
 
 export type DragHandler = (dx: number, dy: number) => void;
 
-export default function useDragListener(callback: DragHandler) {
+export default function useDragListener(callback: DragHandler, button = 0) {
   const [active, { clear, set }] = useFlag(false);
   const [x, setX] = useState(NaN);
   const [y, setY] = useState(NaN);
@@ -13,11 +13,13 @@ export default function useDragListener(callback: DragHandler) {
 
   const onPointerDown = useCallback<PointerEventHandler>(
     (e) => {
+      if (e.button !== button) return;
+
       set();
       setX(e.clientX);
       setY(e.clientY);
     },
-    [set]
+    [button, set]
   );
   const onPointerMove = useCallback<PointerEventHandler>(
     (e) => {
@@ -34,10 +36,12 @@ export default function useDragListener(callback: DragHandler) {
   );
   const onPointerUp = useCallback<PointerEventHandler>(
     (e) => {
-      onPointerMove(e);
-      clear();
+      if (active) {
+        onPointerMove(e);
+        clear();
+      }
     },
-    [clear, onPointerMove]
+    [active, clear, onPointerMove]
   );
 
   return { cursor, onPointerDown, onPointerUp, onPointerMove };

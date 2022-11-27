@@ -4,14 +4,12 @@ export default function getGridCoordinate(
   xo: number,
   yo: number,
   zoom: number,
-  e: {
-    clientX: number;
-    clientY: number;
-  }
+  mx: number,
+  my: number
 ): [x: number, y: number] {
   const gridSize = getGridSize(zoom);
-  const x = Math.round((e.clientX - xo) / gridSize);
-  const y = Math.round((e.clientY - yo) / gridSize);
+  const x = Math.round((mx - xo) / gridSize);
+  const y = Math.round((my - yo) / gridSize);
 
   return [x, y];
 }

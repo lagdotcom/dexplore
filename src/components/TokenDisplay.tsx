@@ -5,24 +5,24 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { selectDraggingTokenId, selectPosition } from "../store/selectors";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import CanvasPosition from "../../types/CanvasPosition";
-import DragInfo from "../../types/DragInfo";
-import { DragInfoData } from "../../logic/symbols";
-import Token from "../../types/Token";
-import { TokenLayer } from "../../logic/layers";
-import getGridSize from "../../logic/getGridSize";
-import pack from "../../logic/pack";
-import { selectDraggingTokenId } from "../../store/selectors";
-import { setDragging } from "../../store/slices/app";
-import useTokenDrop from "../../hooks/useTokenDrop";
+import DragInfo from "../types/DragInfo";
+import { DragInfoData } from "../logic/symbols";
+import Token from "../types/Token";
+import { TokenZ } from "../logic/layers";
+import getGridSize from "../logic/getGridSize";
+import pack from "../logic/pack";
+import { setDragging } from "../store/slices/app";
+import useTokenDrop from "../hooks/useTokenDrop";
 
-type Props = { position: CanvasPosition; token: Token };
+type Props = { token: Token };
 
-export default function TokenDisplay({ position, token }: Props) {
+export default function TokenDisplay({ token }: Props) {
   const imgRef = useRef(null);
   const dispatch = useAppDispatch();
+  const position = useAppSelector(selectPosition);
   const gridSize = useMemo(() => getGridSize(position.z), [position.z]);
 
   const left = useMemo(
@@ -80,7 +80,7 @@ export default function TokenDisplay({ position, token }: Props) {
       pointerEvents,
       left,
       top,
-      zIndex: TokenLayer - token.size,
+      zIndex: TokenZ - token.size,
       width: size,
       height: size,
     }),

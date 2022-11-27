@@ -1,7 +1,7 @@
-import ScrollableCanvas, { RenderCallback } from ".";
+import ScrollableCanvas, { RenderCallback } from "./ScrollableCanvas";
 import { act, fireEvent, screen } from "@testing-library/react";
 
-import { renderWithProviders } from "../../test/tools";
+import { renderWithProviders } from "../test/tools";
 import userEvent from "@testing-library/user-event";
 
 function delay(ms: number) {
