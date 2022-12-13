@@ -1,4 +1,11 @@
-import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
+import {
+  CSSProperties,
+  DragEventHandler,
+  MouseEventHandler,
+  useCallback,
+  useMemo,
+} from "react";
+import { openContextMenu, setDragging } from "../store/slices/app";
 import {
   selectActiveLayer,
   selectDraggingId,
@@ -12,7 +19,6 @@ import DragInfo from "../types/DragInfo";
 import { DragInfoData } from "../logic/symbols";
 import getGridSize from "../logic/getGridSize";
 import pack from "../logic/pack";
-import { setDragging } from "../store/slices/app";
 import useThingDrop from "../hooks/useThingDrop";
 
 type Props = { backdrop: Backdrop };
@@ -65,6 +71,21 @@ export default function BackdropDisplay({ backdrop }: Props) {
     position.z
   );
 
+  const onContextMenu = useCallback<MouseEventHandler>(
+    (e) => {
+      dispatch(
+        openContextMenu({
+          type: "backdrop",
+          id: backdrop.id,
+          x: e.clientX,
+          y: e.clientY,
+        })
+      );
+      e.preventDefault();
+    },
+    [backdrop.id, dispatch]
+  );
+
   const draggingId = useAppSelector(selectDraggingId);
   const pointerEvents = useMemo(() => {
     if (layer !== "backdrop") return "none";
@@ -95,6 +116,7 @@ export default function BackdropDisplay({ backdrop }: Props) {
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onContextMenu={onContextMenu}
     >
       <img src={backdrop.url} alt={backdrop.id} width={width} height={height} />
     </div>

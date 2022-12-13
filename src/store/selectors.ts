@@ -13,5 +13,7 @@ export const {
   selectEntities: selectTokenDictionary,
 } = tokenAdapter.getSelectors<RootState>((state) => state.tokens);
 
-export const { selectAll: selectAllBackdrops } =
-  backdropAdapter.getSelectors<RootState>((state) => state.backdrops);
+export const {
+  selectAll: selectAllBackdrops,
+  selectEntities: selectBackdropDictionary,
+} = backdropAdapter.getSelectors<RootState>((state) => state.backdrops);

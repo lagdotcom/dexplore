@@ -1,4 +1,11 @@
-import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
+import {
+  CSSProperties,
+  DragEventHandler,
+  MouseEventHandler,
+  useCallback,
+  useMemo,
+} from "react";
+import { openContextMenu, setDragging } from "../store/slices/app";
 import {
   selectActiveLayer,
   selectDraggingId,
@@ -12,7 +19,6 @@ import Token from "../types/Token";
 import { TokenZ } from "../logic/layers";
 import getGridSize from "../logic/getGridSize";
 import pack from "../logic/pack";
-import { setDragging } from "../store/slices/app";
 import useThingDrop from "../hooks/useThingDrop";
 
 type Props = { token: Token };
@@ -58,6 +64,21 @@ export default function TokenDisplay({ token }: Props) {
     position.z
   );
 
+  const onContextMenu = useCallback<MouseEventHandler>(
+    (e) => {
+      dispatch(
+        openContextMenu({
+          type: "token",
+          id: token.id,
+          x: e.clientX,
+          y: e.clientY,
+        })
+      );
+      e.preventDefault();
+    },
+    [token.id, dispatch]
+  );
+
   const draggingId = useAppSelector(selectDraggingId);
   const pointerEvents = useMemo(() => {
     if (layer !== "token") return "none";
@@ -88,6 +109,7 @@ export default function TokenDisplay({ token }: Props) {
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onContextMenu={onContextMenu}
     >
       <img src={token.url} alt={token.id} width={size} height={size} />
     </div>

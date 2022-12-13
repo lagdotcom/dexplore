@@ -10,9 +10,10 @@ const slice = createSlice({
   reducers: {
     addToken: tokenAdapter.upsertOne,
     addTokens: tokenAdapter.upsertMany,
+    removeToken: tokenAdapter.removeOne,
     updateToken: tokenAdapter.updateOne,
   },
 });
 
-export const { addToken, addTokens, updateToken } = slice.actions;
+export const { addToken, addTokens, removeToken, updateToken } = slice.actions;
 export default slice.reducer;

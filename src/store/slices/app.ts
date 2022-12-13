@@ -1,8 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-export type ContextMenuState = { type: "new"; x: number; y: number };
+export type ContextMenuState =
+  | { type: "new"; x: number; y: number }
+  | { type: "backdrop"; x: number; y: number; id: string }
+  | { type: "token"; x: number; y: number; id: string };
 
 export type DialogState =
+  | { type: "backdrop"; id: string }
+  | { type: "token"; id: string }
   | { type: "newBackdrop"; x: number; y: number }
   | { type: "newToken"; x: number; y: number };
 

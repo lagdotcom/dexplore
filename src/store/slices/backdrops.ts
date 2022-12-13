@@ -10,9 +10,11 @@ const slice = createSlice({
   reducers: {
     addBackdrop: backdropAdapter.upsertOne,
     addBackdrops: backdropAdapter.upsertMany,
+    removeBackdrop: backdropAdapter.removeOne,
     updateBackdrop: backdropAdapter.updateOne,
   },
 });
 
-export const { addBackdrop, addBackdrops, updateBackdrop } = slice.actions;
+export const { addBackdrop, addBackdrops, removeBackdrop, updateBackdrop } =
+  slice.actions;
 export default slice.reducer;
