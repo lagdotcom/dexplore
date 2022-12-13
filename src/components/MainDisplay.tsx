@@ -1,30 +1,27 @@
-import { CSSProperties, useCallback } from "react";
-import { ContextOverlay, DialogOverlay } from "./Overlays";
 import ScrollableCanvas, { RenderCallback } from "./ScrollableCanvas";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import BackdropContextMenu from "./BackdropContextMenu";
 import BackdropLayer from "./BackdropLayer";
+import { Box } from "@chakra-ui/react";
+import { ContextMenu } from "chakra-ui-contextmenu";
 import EditBackdropDialog from "./EditBackdropDialog";
 import EditTokenDialog from "./EditTokenDialog";
 import NewBackdropDialog from "./NewBackdropDialog";
 import NewContextMenu from "./NewContextMenu";
 import NewTokenDialog from "./NewTokenDialog";
-import TokenContextMenu from "./TokenContextMenu";
 import TokenLayer from "./TokenLayer";
 import Toolbar from "./Toolbar";
 import { addTokens } from "../store/slices/tokens";
 import getGridSize from "../logic/getGridSize";
 import { selectDialog } from "../store/selectors";
 import { setPosition } from "../store/slices/app";
+import { useCallback } from "react";
 import { useEffectOnce } from "react-use";
 
 function start(offset: number, size: number) {
   const position = offset % size;
   return position < 0 ? position + size : position;
 }
-
-const style: CSSProperties = { overflow: "hidden", position: "relative" };
 
 export default function MainDisplay() {
   const dispatch = useAppDispatch();
@@ -91,15 +88,12 @@ export default function MainDisplay() {
   );
 
   return (
-    <div style={style}>
-      <ScrollableCanvas onPaint={render} />
+    <Box overflow="hidden" position="relative">
+      <ContextMenu<HTMLCanvasElement> renderMenu={() => <NewContextMenu />}>
+        {(ref) => <ScrollableCanvas ref={ref} onPaint={render} />}
+      </ContextMenu>
       <BackdropLayer />
       <TokenLayer />
-      <ContextOverlay />
-      <DialogOverlay />
-      <NewContextMenu />
-      <BackdropContextMenu />
-      <TokenContextMenu />
       {dialog?.type === "newBackdrop" && (
         <NewBackdropDialog x={dialog.x} y={dialog.y} />
       )}
@@ -109,6 +103,6 @@ export default function MainDisplay() {
       {dialog?.type === "backdrop" && <EditBackdropDialog id={dialog.id} />}
       {dialog?.type === "token" && <EditTokenDialog id={dialog.id} />}
       <Toolbar />
-    </div>
+    </Box>
   );
 }

@@ -1,38 +1,16 @@
-import {
-  ButtonHTMLAttributes,
-  CSSProperties,
-  DetailedHTMLProps,
-  PropsWithChildren,
-  useMemo,
-} from "react";
+import { Button } from "@chakra-ui/react";
+import { PropsWithChildren } from "react";
 
-type ButtonProps = DetailedHTMLProps<
-  ButtonHTMLAttributes<HTMLButtonElement>,
-  HTMLButtonElement
->;
-
-type Props = PropsWithChildren<ButtonProps & { selected?: boolean }>;
+type Props = PropsWithChildren<{ isActive?: boolean; onClick?(): void }>;
 
 export default function ToggleButton({
   children,
-  selected = false,
-  ...buttonProps
+  isActive = false,
+  onClick,
 }: Props) {
-  const style = useMemo<CSSProperties>(
-    () => ({
-      backgroundColor: selected ? "yellow" : undefined,
-    }),
-    [selected]
-  );
-
   return (
-    <button
-      role="menuitemradio"
-      aria-checked={selected}
-      style={style}
-      {...buttonProps}
-    >
+    <Button isActive={isActive} onClick={onClick}>
       {children}
-    </button>
+    </Button>
   );
 }

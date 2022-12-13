@@ -1,11 +1,5 @@
-import {
-  CSSProperties,
-  DragEventHandler,
-  MouseEventHandler,
-  useCallback,
-  useMemo,
-} from "react";
-import { openContextMenu, setDragging } from "../store/slices/app";
+import { Box, Image } from "@chakra-ui/react";
+import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
 import {
   selectActiveLayer,
   selectDraggingId,
@@ -14,11 +8,14 @@ import {
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 import Backdrop from "../types/Backdrop";
+import BackdropContextMenu from "./BackdropContextMenu";
 import { BackdropZ } from "../logic/layers";
+import { ContextMenu } from "chakra-ui-contextmenu";
 import DragInfo from "../types/DragInfo";
 import { DragInfoData } from "../logic/symbols";
 import getGridSize from "../logic/getGridSize";
 import pack from "../logic/pack";
+import { setDragging } from "../store/slices/app";
 import useThingDrop from "../hooks/useThingDrop";
 
 type Props = { backdrop: Backdrop };
@@ -71,21 +68,6 @@ export default function BackdropDisplay({ backdrop }: Props) {
     position.z
   );
 
-  const onContextMenu = useCallback<MouseEventHandler>(
-    (e) => {
-      dispatch(
-        openContextMenu({
-          type: "backdrop",
-          id: backdrop.id,
-          x: e.clientX,
-          y: e.clientY,
-        })
-      );
-      e.preventDefault();
-    },
-    [backdrop.id, dispatch]
-  );
-
   const draggingId = useAppSelector(selectDraggingId);
   const pointerEvents = useMemo(() => {
     if (layer !== "backdrop") return "none";
@@ -109,16 +91,27 @@ export default function BackdropDisplay({ backdrop }: Props) {
   );
 
   return (
-    <div
-      draggable="true"
-      style={style}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onContextMenu={onContextMenu}
+    <ContextMenu<HTMLDivElement>
+      renderMenu={() => <BackdropContextMenu id={backdrop.id} />}
     >
-      <img src={backdrop.url} alt={backdrop.id} width={width} height={height} />
-    </div>
+      {(ref) => (
+        <Box
+          ref={ref}
+          draggable
+          style={style}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <Image
+            src={backdrop.url}
+            alt={backdrop.id}
+            width={width}
+            height={height}
+          />
+        </Box>
+      )}
+    </ContextMenu>
   );
 }

@@ -1,21 +1,27 @@
-import { CSSProperties, useCallback, useId, useMemo, useState } from "react";
+import {
+  Button,
+  Flex,
+  Heading,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/react";
+import { useCallback, useMemo, useState } from "react";
 
 import Backdrop from "../types/Backdrop";
 import BackdropFields from "./BackdropFields";
+import ThingPreview from "./ThingPreview";
 import { addBackdrop } from "../store/slices/backdrops";
 import { closeDialog } from "../store/slices/app";
-import dialogStyle from "../styles/dialog";
 import { useAppDispatch } from "../store/hooks";
 import { v4 } from "uuid";
-
-const headerStyle: CSSProperties = { display: "flex" };
-
-const headerTextStyle: CSSProperties = { flexGrow: 1 };
 
 type Props = { x: number; y: number };
 
 export default function NewBackdropDialog({ x, y }: Props) {
-  const labelId = useId();
   const dispatch = useAppDispatch();
   const [backdrop, setBackdrop] = useState<Backdrop>({
     id: v4(),
@@ -31,31 +37,34 @@ export default function NewBackdropDialog({ x, y }: Props) {
     dispatch(closeDialog());
   }, [backdrop, dispatch]);
 
+  const onClose = useCallback(() => {
+    dispatch(closeDialog());
+  }, [dispatch]);
+
   const isInvalid = useMemo(() => {
     if (!backdrop.id) return true;
     if (!backdrop.url) return true;
   }, [backdrop.id, backdrop.url]);
 
-  const img = useMemo(() => {
-    if (backdrop.url)
-      return (
-        <img src={backdrop.url} alt={backdrop.id} width={64} height={64} />
-      );
-  }, [backdrop.id, backdrop.url]);
-
   return (
-    <div role="dialog" aria-labelledby={labelId} style={dialogStyle}>
-      <div style={headerStyle}>
-        <h2 id={labelId} style={headerTextStyle}>
-          New Backdrop...
-        </h2>
-        {img}
-      </div>
-
-      <BackdropFields isNew backdrop={backdrop} setBackdrop={setBackdrop} />
-      <button disabled={isInvalid} onClick={onClickOK}>
-        OK
-      </button>
-    </div>
+    <Modal isOpen={true} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          <Flex>
+            <Heading flexGrow={1}>New Backdrop</Heading>
+            <ThingPreview url={backdrop.url} />
+          </Flex>
+        </ModalHeader>
+        <ModalBody>
+          <BackdropFields isNew backdrop={backdrop} setBackdrop={setBackdrop} />
+        </ModalBody>
+        <ModalFooter>
+          <Button colorScheme="green" disabled={isInvalid} onClick={onClickOK}>
+            OK
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }

@@ -1,17 +1,11 @@
-import { CSSProperties, useCallback } from "react";
+import { Box, ButtonGroup } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 import ToggleButton from "./ToggleButton";
 import { ToolbarZ } from "../logic/layers";
 import { selectActiveLayer } from "../store/selectors";
 import { setActiveLayer } from "../store/slices/app";
-
-const style: CSSProperties = {
-  position: "absolute",
-  left: 16,
-  bottom: 16,
-  zIndex: ToolbarZ,
-};
+import { useCallback } from "react";
 
 export default function Toolbar() {
   const dispatch = useAppDispatch();
@@ -27,15 +21,15 @@ export default function Toolbar() {
   );
 
   return (
-    <div role="menubar" style={style}>
-      <div role="group" aria-label="Active Layer">
-        <ToggleButton onClick={onClickBackdrop} selected={layer === "backdrop"}>
+    <Box position="absolute" left={2} bottom={2} zIndex={ToolbarZ}>
+      <ButtonGroup>
+        <ToggleButton onClick={onClickBackdrop} isActive={layer === "backdrop"}>
           Backdrop
         </ToggleButton>
-        <ToggleButton onClick={onClickToken} selected={layer === "token"}>
+        <ToggleButton onClick={onClickToken} isActive={layer === "token"}>
           Token
         </ToggleButton>
-      </div>
-    </div>
+      </ButtonGroup>
+    </Box>
   );
 }

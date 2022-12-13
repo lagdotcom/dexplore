@@ -1,11 +1,4 @@
-import {
-  CSSProperties,
-  DragEventHandler,
-  MouseEventHandler,
-  useCallback,
-  useMemo,
-} from "react";
-import { openContextMenu, setDragging } from "../store/slices/app";
+import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
 import {
   selectActiveLayer,
   selectDraggingId,
@@ -13,12 +6,16 @@ import {
 } from "../store/selectors";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
+import { ContextMenu } from "chakra-ui-contextmenu";
 import DragInfo from "../types/DragInfo";
 import { DragInfoData } from "../logic/symbols";
+import { Image } from "@chakra-ui/react";
 import Token from "../types/Token";
+import TokenContextMenu from "./TokenContextMenu";
 import { TokenZ } from "../logic/layers";
 import getGridSize from "../logic/getGridSize";
 import pack from "../logic/pack";
+import { setDragging } from "../store/slices/app";
 import useThingDrop from "../hooks/useThingDrop";
 
 type Props = { token: Token };
@@ -64,21 +61,6 @@ export default function TokenDisplay({ token }: Props) {
     position.z
   );
 
-  const onContextMenu = useCallback<MouseEventHandler>(
-    (e) => {
-      dispatch(
-        openContextMenu({
-          type: "token",
-          id: token.id,
-          x: e.clientX,
-          y: e.clientY,
-        })
-      );
-      e.preventDefault();
-    },
-    [token.id, dispatch]
-  );
-
   const draggingId = useAppSelector(selectDraggingId);
   const pointerEvents = useMemo(() => {
     if (layer !== "token") return "none";
@@ -102,16 +84,22 @@ export default function TokenDisplay({ token }: Props) {
   );
 
   return (
-    <div
-      draggable="true"
-      style={style}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onContextMenu={onContextMenu}
+    <ContextMenu<HTMLDivElement>
+      renderMenu={() => <TokenContextMenu id={token.id} />}
     >
-      <img src={token.url} alt={token.id} width={size} height={size} />
-    </div>
+      {(ref) => (
+        <div
+          ref={ref}
+          draggable
+          style={style}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <Image src={token.url} alt={token.id} width={size} height={size} />
+        </div>
+      )}
+    </ContextMenu>
   );
 }

@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { NumberField, TextField } from "./Fields";
 
+import { Flex } from "@chakra-ui/react";
 import Token from "../types/Token";
 import useFieldUpdater from "../hooks/useFieldUpdater";
 
@@ -26,15 +27,17 @@ export default function TokenFields({ token, setToken, isNew = false }: Props) {
         readOnly={!isNew}
       />
       <TextField label="URL" value={token.url} setValue={setUrl} />
-      <NumberField label="X" value={token.x} setValue={setX} />
-      <NumberField label="Y" value={token.y} setValue={setY} />
-      <NumberField
-        label="Size"
-        value={token.size}
-        setValue={setSize}
-        min={1}
-        max={5}
-      />
+      <Flex>
+        <NumberField label="X" value={token.x} setValue={setX} />
+        <NumberField label="Y" value={token.y} setValue={setY} />
+        <NumberField
+          label="Size"
+          value={token.size}
+          setValue={setSize}
+          min={1}
+          max={5}
+        />
+      </Flex>
     </fieldset>
   );
 }

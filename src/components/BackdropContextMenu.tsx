@@ -1,29 +1,31 @@
+import { MenuItem, MenuList } from "@chakra-ui/react";
 import { closeContextMenu, openDialog } from "../store/slices/app";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import ContextMenu from "./ContextMenu";
+import { ActiveZ } from "../logic/layers";
 import { removeBackdrop } from "../store/slices/backdrops";
-import { selectContextMenu } from "../store/selectors";
+import { useAppDispatch } from "../store/hooks";
 import { useCallback } from "react";
 
-export default function BackdropContextMenu() {
+type Props = { id: string };
+
+export default function BackdropContextMenu({ id }: Props) {
   const dispatch = useAppDispatch();
-  const menu = useAppSelector(selectContextMenu);
 
   const onEdit = useCallback(() => {
-    if (menu?.type === "backdrop")
-      dispatch(openDialog({ type: "backdrop", id: menu.id }));
+    dispatch(openDialog({ type: "backdrop", id }));
     dispatch(closeContextMenu());
-  }, [dispatch, menu]);
+  }, [dispatch, id]);
   const onDelete = useCallback(() => {
-    if (menu?.type === "backdrop") dispatch(removeBackdrop(menu.id));
+    dispatch(removeBackdrop(id));
     dispatch(closeContextMenu());
-  }, [dispatch, menu]);
+  }, [dispatch, id]);
 
   return (
-    <ContextMenu type="backdrop">
-      <button onClick={onEdit}>Edit...</button>
-      <button onClick={onDelete}>Delete</button>
-    </ContextMenu>
+    <MenuList zIndex={ActiveZ}>
+      <MenuItem onClick={onEdit}>Edit...</MenuItem>
+      <MenuItem color="red" onClick={onDelete}>
+        Delete
+      </MenuItem>
+    </MenuList>
   );
 }

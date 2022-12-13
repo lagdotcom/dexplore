@@ -2,6 +2,7 @@ import { AppStore, RootState, setupStore } from "../store";
 import { PropsWithChildren, ReactElement } from "react";
 import { RenderOptions, render } from "@testing-library/react";
 
+import { ChakraProvider } from "@chakra-ui/react";
 import { PreloadedState } from "@reduxjs/toolkit";
 import { Provider as StoreProvider } from "react-redux";
 
@@ -20,7 +21,11 @@ export function renderWithProviders(
 ) {
   // eslint-disable-next-line @typescript-eslint/ban-types
   function wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
-    return <StoreProvider store={store}>{children}</StoreProvider>;
+    return (
+      <ChakraProvider>
+        <StoreProvider store={store}>{children}</StoreProvider>
+      </ChakraProvider>
+    );
   }
 
   return { store, ...render(ui, { wrapper, ...renderOptions }) };

@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { NumberField, TextField } from "./Fields";
 
 import Backdrop from "../types/Backdrop";
+import { Flex } from "@chakra-ui/react";
 import useFieldUpdater from "../hooks/useFieldUpdater";
 
 type Props = {
@@ -31,20 +32,22 @@ export default function BackdropFields({
         readOnly={!isNew}
       />
       <TextField label="URL" value={backdrop.url} setValue={setUrl} />
-      <NumberField label="X" value={backdrop.x} setValue={setX} />
-      <NumberField label="Y" value={backdrop.y} setValue={setY} />
-      <NumberField
-        label="Width"
-        value={backdrop.width}
-        setValue={setWidth}
-        min={1}
-      />
-      <NumberField
-        label="Height"
-        value={backdrop.height}
-        setValue={setHeight}
-        min={1}
-      />
+      <Flex>
+        <NumberField label="X" value={backdrop.x} setValue={setX} />
+        <NumberField label="Y" value={backdrop.y} setValue={setY} />
+        <NumberField
+          label="Width"
+          value={backdrop.width}
+          setValue={setWidth}
+          min={1}
+        />
+        <NumberField
+          label="Height"
+          value={backdrop.height}
+          setValue={setHeight}
+          min={1}
+        />
+      </Flex>
     </fieldset>
   );
 }

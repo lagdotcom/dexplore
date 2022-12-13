@@ -13,7 +13,12 @@
   "author": "Lag.Com <lagdotcom@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "@chakra-ui/react": "^2.4.3",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
     "@reduxjs/toolkit": "^1.9.1",
+    "chakra-ui-contextmenu": "^1.0.5",
+    "framer-motion": "^7.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",

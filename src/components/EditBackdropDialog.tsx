@@ -1,33 +1,29 @@
 import {
-  CSSProperties,
-  SetStateAction,
-  useCallback,
-  useId,
-  useMemo,
-  useState,
-} from "react";
+  Button,
+  ButtonGroup,
+  Flex,
+  Heading,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/react";
+import { SetStateAction, useCallback, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 import Backdrop from "../types/Backdrop";
 import BackdropFields from "./BackdropFields";
+import ThingPreview from "./ThingPreview";
 import { closeDialog } from "../store/slices/app";
-import dialogStyle from "../styles/dialog";
 import { selectBackdropDictionary } from "../store/selectors";
 import { updateBackdrop } from "../store/slices/backdrops";
 import { useEffectOnce } from "react-use";
 
-const headerStyle: CSSProperties = { display: "flex" };
-
-const headerTextStyle: CSSProperties = { flexGrow: 1 };
-
-const buttonBarStyle: CSSProperties = { display: "flex" };
-
-const buttonStyle: CSSProperties = { flexGrow: 1 };
-
 type Props = { id: Backdrop["id"] };
 
 export default function EditBackdropDialog({ id }: Props) {
-  const labelId = useId();
   const dispatch = useAppDispatch();
   const backdrops = useAppSelector(selectBackdropDictionary);
   const [original, setOriginal] = useState<Backdrop>({
@@ -73,36 +69,41 @@ export default function EditBackdropDialog({ id }: Props) {
     dispatch(closeDialog());
   }, [dispatch, id, original]);
 
+  const onClose = useCallback(() => {
+    dispatch(closeDialog());
+  }, [dispatch]);
+
   const isInvalid = useMemo(() => {
     if (!backdrop.id) return true;
     if (!backdrop.url) return true;
   }, [backdrop.id, backdrop.url]);
 
-  const img = useMemo(() => {
-    if (backdrop.url)
-      return (
-        <img src={backdrop.url} alt={backdrop.id} width={64} height={64} />
-      );
-  }, [backdrop.id, backdrop.url]);
-
   return (
-    <div role="dialog" aria-labelledby={labelId} style={dialogStyle}>
-      <div style={headerStyle}>
-        <h2 id={labelId} style={headerTextStyle}>
-          Edit Backdrop...
-        </h2>
-        {img}
-      </div>
-
-      <BackdropFields backdrop={backdrop} setBackdrop={onUpdate} />
-      <div style={buttonBarStyle}>
-        <button style={buttonStyle} onClick={onClickCancel}>
-          Cancel
-        </button>
-        <button style={buttonStyle} disabled={isInvalid} onClick={onClickOK}>
-          OK
-        </button>
-      </div>
-    </div>
+    <Modal isOpen={true} onClose={onClose}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>
+          <Flex>
+            <Heading flexGrow={1}>Edit Backdrop</Heading>
+            <ThingPreview url={backdrop.url} />
+          </Flex>
+        </ModalHeader>
+        <ModalBody>
+          <BackdropFields backdrop={backdrop} setBackdrop={onUpdate} />
+        </ModalBody>
+        <ModalFooter>
+          <ButtonGroup>
+            <Button onClick={onClickCancel}>Cancel</Button>
+            <Button
+              colorScheme="green"
+              disabled={isInvalid}
+              onClick={onClickOK}
+            >
+              OK
+            </Button>
+          </ButtonGroup>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }

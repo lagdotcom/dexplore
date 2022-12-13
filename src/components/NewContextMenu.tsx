@@ -1,8 +1,9 @@
+import { MenuItem, MenuList } from "@chakra-ui/react";
 import { closeContextMenu, openDialog } from "../store/slices/app";
 import { selectContextMenu, selectPosition } from "../store/selectors";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import ContextMenu from "./ContextMenu";
+import { ActiveZ } from "../logic/layers";
 import getGridCoordinate from "../logic/getGridCoordinate";
 import { useCallback } from "react";
 
@@ -43,9 +44,9 @@ export default function NewContextMenu() {
   }, [dispatch, menu, position]);
 
   return (
-    <ContextMenu type="new">
-      <button onClick={onNewBackdrop}>New Backdrop...</button>
-      <button onClick={onNewToken}>New Token...</button>
-    </ContextMenu>
+    <MenuList zIndex={ActiveZ}>
+      <MenuItem onClick={onNewBackdrop}>New Backdrop...</MenuItem>
+      <MenuItem onClick={onNewToken}>New Token...</MenuItem>
+    </MenuList>
   );
 }
