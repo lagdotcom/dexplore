@@ -13,7 +13,7 @@ import { useRafLoop, useWindowSize } from "react-use";
 import clamp from "../tools/clamp";
 import { openContextMenu } from "../store/slices/app";
 import { useAppDispatch } from "../store/hooks";
-import useTokenDrop from "../hooks/useTokenDrop";
+import useThingDrop from "../hooks/useThingDrop";
 
 export type RenderCallback = (
   ctx: CanvasRenderingContext2D,
@@ -69,7 +69,7 @@ export default function ScrollableCanvas({ onPaint }: Props): JSX.Element {
     [dispatch]
   );
 
-  const { onDragOver, onDrop } = useTokenDrop(xo, yo, zoom);
+  const { onDragOver, onDrop } = useThingDrop(xo, yo, zoom);
 
   const { cursor, ...canvasProps } = useDragListener(onDrag);
   const style = useMemo(

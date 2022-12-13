@@ -6,28 +6,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import { NumberField, TextField } from "./Fields";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import { ActiveZ } from "../logic/layers";
+import Backdrop from "../types/Backdrop";
+import BackdropFields from "./BackdropFields";
 import { addBackdrop } from "../store/slices/backdrops";
 import { closeDialog } from "../store/slices/app";
+import dialogStyle from "../styles/dialog";
 import { selectDialog } from "../store/selectors";
 import { v4 } from "uuid";
-
-const dialogStyle: CSSProperties = {
-  position: "fixed",
-  zIndex: ActiveZ,
-  top: "50%",
-  left: "50%",
-  transform: "translateX(-50%) translateY(-50%)",
-  background: "white",
-  border: "1px solid black",
-  padding: 4,
-  display: "flex",
-  flexDirection: "column",
-  overflow: "hidden",
-};
 
 const headerStyle: CSSProperties = { display: "flex" };
 
@@ -37,39 +24,43 @@ export default function NewBackdropDialog() {
   const labelId = useId();
   const dispatch = useAppDispatch();
   const dialog = useAppSelector(selectDialog);
-
-  const [id, setId] = useState("");
-  const [url, setUrl] = useState("");
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
-  const [width, setWidth] = useState(1);
-  const [height, setHeight] = useState(1);
+  const [backdrop, setBackdrop] = useState<Backdrop>({
+    id: "",
+    url: "",
+    x: 0,
+    y: 0,
+    width: 1,
+    height: 1,
+  });
 
   useEffect(() => {
-    if (dialog?.type === "newBackdrop") {
-      setId(v4());
-      setUrl("");
-      setX(dialog.x);
-      setY(dialog.y);
-      setWidth(1);
-      setHeight(1);
-    }
+    if (dialog?.type === "newBackdrop")
+      setBackdrop({
+        id: v4(),
+        url: "",
+        x: dialog.x,
+        y: dialog.y,
+        width: 1,
+        height: 1,
+      });
   }, [dialog]);
 
   const onClickOK = useCallback(() => {
-    dispatch(addBackdrop({ id, url, x, y, width, height }));
+    dispatch(addBackdrop(backdrop));
     dispatch(closeDialog());
-  }, [dispatch, height, id, url, width, x, y]);
+  }, [backdrop, dispatch]);
 
   const isInvalid = useMemo(() => {
-    if (!id) return true;
-    if (!url) return true;
-  }, [id, url]);
+    if (!backdrop.id) return true;
+    if (!backdrop.url) return true;
+  }, [backdrop.id, backdrop.url]);
 
   const img = useMemo(() => {
-    if (dialog?.type === "newBackdrop" && url)
-      return <img src={url} alt={id} width={64} height={64} />;
-  }, [dialog?.type, id, url]);
+    if (dialog?.type === "newBackdrop" && backdrop.url)
+      return (
+        <img src={backdrop.url} alt={backdrop.id} width={64} height={64} />
+      );
+  }, [backdrop.id, backdrop.url, dialog?.type]);
 
   if (dialog?.type === "newBackdrop")
     return (
@@ -81,17 +72,7 @@ export default function NewBackdropDialog() {
           {img}
         </div>
 
-        <TextField label="ID" value={id} setValue={setId} />
-        <TextField label="URL" value={url} setValue={setUrl} />
-        <NumberField label="X" value={x} setValue={setX} />
-        <NumberField label="Y" value={y} setValue={setY} />
-        <NumberField label="Width" value={width} setValue={setWidth} min={1} />
-        <NumberField
-          label="Height"
-          value={height}
-          setValue={setHeight}
-          min={1}
-        />
+        <BackdropFields isNew backdrop={backdrop} setBackdrop={setBackdrop} />
         <button disabled={isInvalid} onClick={onClickOK}>
           OK
         </button>

@@ -6,28 +6,15 @@ import {
   useMemo,
   useState,
 } from "react";
-import { NumberField, TextField } from "./Fields";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-import { ActiveZ } from "../logic/layers";
+import Token from "../types/Token";
+import TokenFields from "./TokenFields";
 import { addToken } from "../store/slices/tokens";
 import { closeDialog } from "../store/slices/app";
+import dialogStyle from "../styles/dialog";
 import { selectDialog } from "../store/selectors";
 import { v4 } from "uuid";
-
-const dialogStyle: CSSProperties = {
-  position: "fixed",
-  zIndex: ActiveZ,
-  top: "50%",
-  left: "50%",
-  transform: "translateX(-50%) translateY(-50%)",
-  background: "white",
-  border: "1px solid black",
-  padding: 4,
-  display: "flex",
-  flexDirection: "column",
-  overflow: "hidden",
-};
 
 const headerStyle: CSSProperties = { display: "flex" };
 
@@ -37,37 +24,33 @@ export default function NewTokenDialog() {
   const labelId = useId();
   const dispatch = useAppDispatch();
   const dialog = useAppSelector(selectDialog);
-
-  const [id, setId] = useState("");
-  const [url, setUrl] = useState("");
-  const [x, setX] = useState(0);
-  const [y, setY] = useState(0);
-  const [size, setSize] = useState(1);
+  const [token, setToken] = useState<Token>({
+    id: "",
+    url: "",
+    x: 0,
+    y: 0,
+    size: 1,
+  });
 
   useEffect(() => {
-    if (dialog?.type === "newToken") {
-      setId(v4());
-      setUrl("");
-      setX(dialog.x);
-      setY(dialog.y);
-      setSize(1);
-    }
+    if (dialog?.type === "newToken")
+      setToken({ id: v4(), url: "", x: dialog.x, y: dialog.y, size: 1 });
   }, [dialog]);
 
   const onClickOK = useCallback(() => {
-    dispatch(addToken({ id, url, x, y, size }));
+    dispatch(addToken(token));
     dispatch(closeDialog());
-  }, [dispatch, id, size, url, x, y]);
+  }, [dispatch, token]);
 
   const isInvalid = useMemo(() => {
-    if (!id) return true;
-    if (!url) return true;
-  }, [id, url]);
+    if (!token.id) return true;
+    if (!token.url) return true;
+  }, [token.id, token.url]);
 
   const img = useMemo(() => {
-    if (dialog?.type === "newToken" && url)
-      return <img src={url} alt={id} width={64} height={64} />;
-  }, [dialog?.type, id, url]);
+    if (dialog?.type === "newToken" && token.url)
+      return <img src={token.url} alt={token.id} width={64} height={64} />;
+  }, [dialog?.type, token.id, token.url]);
 
   if (dialog?.type === "newToken")
     return (
@@ -79,17 +62,7 @@ export default function NewTokenDialog() {
           {img}
         </div>
 
-        <TextField label="ID" value={id} setValue={setId} />
-        <TextField label="URL" value={url} setValue={setUrl} />
-        <NumberField label="X" value={x} setValue={setX} />
-        <NumberField label="Y" value={y} setValue={setY} />
-        <NumberField
-          label="Size"
-          value={size}
-          setValue={setSize}
-          min={1}
-          max={5}
-        />
+        <TokenFields isNew token={token} setToken={setToken} />
         <button disabled={isInvalid} onClick={onClickOK}>
           OK
         </button>

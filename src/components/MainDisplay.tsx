@@ -7,6 +7,7 @@ import NewBackdropDialog from "./NewBackdropDialog";
 import NewContextMenu from "./NewContextMenu";
 import NewTokenDialog from "./NewTokenDialog";
 import TokenLayer from "./TokenLayer";
+import Toolbar from "./Toolbar";
 import { addTokens } from "../store/slices/tokens";
 import getGridSize from "../logic/getGridSize";
 import { setPosition } from "../store/slices/app";
@@ -92,6 +93,7 @@ export default function MainDisplay() {
       <NewContextMenu />
       <NewBackdropDialog />
       <NewTokenDialog />
+      <Toolbar />
     </div>
   );
 }

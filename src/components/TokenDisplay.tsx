@@ -1,11 +1,9 @@
+import { CSSProperties, DragEventHandler, useCallback, useMemo } from "react";
 import {
-  CSSProperties,
-  DragEventHandler,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-import { selectDraggingTokenId, selectPosition } from "../store/selectors";
+  selectActiveLayer,
+  selectDraggingId,
+  selectPosition,
+} from "../store/selectors";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
 import DragInfo from "../types/DragInfo";
@@ -15,14 +13,14 @@ import { TokenZ } from "../logic/layers";
 import getGridSize from "../logic/getGridSize";
 import pack from "../logic/pack";
 import { setDragging } from "../store/slices/app";
-import useTokenDrop from "../hooks/useTokenDrop";
+import useThingDrop from "../hooks/useThingDrop";
 
 type Props = { token: Token };
 
 export default function TokenDisplay({ token }: Props) {
-  const imgRef = useRef(null);
   const dispatch = useAppDispatch();
   const position = useAppSelector(selectPosition);
+  const layer = useAppSelector(selectActiveLayer);
   const gridSize = useMemo(() => getGridSize(position.z), [position.z]);
 
   const left = useMemo(
@@ -41,7 +39,7 @@ export default function TokenDisplay({ token }: Props) {
       const oy = e.clientY - top;
       e.dataTransfer.setData(
         DragInfoData,
-        pack<DragInfo>({ id: token.id, ox, oy })
+        pack<DragInfo>({ id: token.id, type: "token", ox, oy })
       );
       e.dataTransfer.effectAllowed = "move";
 
@@ -54,25 +52,20 @@ export default function TokenDisplay({ token }: Props) {
     dispatch(setDragging());
   }, [dispatch]);
 
-  const { onDragOver, onDrop } = useTokenDrop(
+  const { onDragOver, onDrop } = useThingDrop(
     position.x,
     position.y,
     position.z
   );
 
-  // TODO replace with generic token image if it failed to load
-  const onError = useCallback(() => {
-    console.log("error", token.url);
-  }, [token.url]);
+  const draggingId = useAppSelector(selectDraggingId);
+  const pointerEvents = useMemo(() => {
+    if (layer !== "token") return "none";
+    if (!draggingId) return "all";
+    if (draggingId === token.id) return "all";
+    return "none";
+  }, [draggingId, layer, token.id]);
 
-  // TODO this doesn't let you move big tokens onto other spaces they occupy
-  const draggingId = useAppSelector(selectDraggingTokenId);
-  const pointerEvents = useMemo(
-    () => (draggingId ? (draggingId === token.id ? "all" : "none") : "all"),
-    [draggingId, token.id]
-  );
-
-  // this saves on ui-box making a new class for every single combination of left and top
   const style = useMemo<CSSProperties>(
     () => ({
       position: "absolute",
@@ -96,14 +89,7 @@ export default function TokenDisplay({ token }: Props) {
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <img
-        ref={imgRef}
-        src={token.url}
-        alt={token.id}
-        width={size}
-        height={size}
-        onError={onError}
-      />
+      <img src={token.url} alt={token.id} width={size} height={size} />
     </div>
   );
 }

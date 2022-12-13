@@ -8,9 +8,19 @@ const labelStyle: CSSProperties = {
 };
 const inputStyle: CSSProperties = { flexGrow: 1 };
 
-type FieldProps<T> = { label: string; value: T; setValue(value: T): void };
+type FieldProps<T> = {
+  label: string;
+  readOnly?: boolean;
+  value: T;
+  setValue(value: T): void;
+};
 
-export function TextField({ label, value, setValue }: FieldProps<string>) {
+export function TextField({
+  label,
+  readOnly,
+  value,
+  setValue,
+}: FieldProps<string>) {
   const id = useId();
   const onChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
     (e) => setValue(e.currentTarget.value),
@@ -27,6 +37,7 @@ export function TextField({ label, value, setValue }: FieldProps<string>) {
         style={inputStyle}
         type="string"
         value={value}
+        readOnly={readOnly}
         onChange={onChange}
       />
     </div>

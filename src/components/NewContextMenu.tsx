@@ -20,7 +20,8 @@ export default function NewContextMenu() {
         position.y,
         position.z,
         menu.x,
-        menu.y
+        menu.y,
+        Math.floor
       );
       dispatch(openDialog({ type: "newBackdrop", x, y }));
     }
@@ -34,7 +35,8 @@ export default function NewContextMenu() {
         position.y,
         position.z,
         menu.x,
-        menu.y
+        menu.y,
+        Math.floor
       );
       dispatch(openDialog({ type: "newToken", x, y }));
     }

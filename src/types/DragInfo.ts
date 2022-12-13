@@ -1,2 +1,7 @@
-type DragInfo = { id: string; ox: number; oy: number };
+type DragInfo = {
+  id: string;
+  type: "backdrop" | "token";
+  ox: number;
+  oy: number;
+};
 export default DragInfo;
